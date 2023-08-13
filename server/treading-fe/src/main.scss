@@ -1,0 +1,18 @@
+.main-container{
+    .top-btn-container{
+        width: 80%;
+        margin-left: 10%;
+        display: flex;
+        justify-content: space-evenly;
+        button{
+            height: 40px;
+            padding: 10px;
+            border-radius: 15px;
+            border: 1px solid black;
+            cursor: pointer;
+            :focus{
+                outline: none;
+            }
+        }
+    }
+}

@@ -1,0 +1,27 @@
+.oiTable-container{
+    border-collapse:collapse;
+    text-align: center;
+    margin: 30px 0;
+    margin-left: 10%;
+    width: 80%;
+    .header{
+      .no-border{
+        th{
+          border: 0;
+        }
+      }
+      th{
+        background-color: cadetblue;
+      }
+    }
+    .body{
+      .danger{
+        background-color: #ff3b3b;
+        color: #fbfb4b;
+      }
+      .safe{
+        color: #290b98;
+        background-color: #a2f328;
+      }
+    }
+}
