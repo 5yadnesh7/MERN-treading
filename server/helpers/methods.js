@@ -59,22 +59,43 @@ const nseApiCall = async (symbol, cb) => {
 
 const checkAndInsertData = async (db, collName, apiRsp) => {
     try {
-        checkCollectionExist(db, collName, async (status) => {
-            if (status) {
-                getData({ "records.timestamp": apiRsp.records.timestamp }, {}, collName, (rsp) => {
-                    if (rsp.length == 0) {
-                        insertData(apiRsp, collName, (rsp) => {
-                            // Data inserted
+        matchCurrentDate(apiRsp.records.timestamp, (isMatch) => {
+            if (isMatch) {
+                checkCollectionExist(db, collName, async (status) => {
+                    if (status) {
+                        getData({ "records.timestamp": apiRsp.records.timestamp }, {}, collName, (rsp) => {
+                            if (rsp.length == 0) {
+                                insertData(apiRsp, collName, (rsp) => {
+                                    // Data inserted
+                                })
+                            }
                         })
+                    } else {
+                        await db.createCollection(collName)
                     }
                 })
-            } else {
-                await db.createCollection(collName)
             }
         })
     } catch (err) {
         console.log("Something went wrong ", err);
     }
+}
+
+const matchCurrentDate = (curDate, cb) => {
+    const givenDate = new Date(curDate);
+
+    const currentDate = new Date();
+
+    const givenYear = givenDate.getFullYear();
+    const givenMonth = givenDate.getMonth();
+    const givenDay = givenDate.getDate();
+
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    const currentDay = currentDate.getDate();
+
+    const datesMatch = givenYear === currentYear && givenMonth === currentMonth && givenDay === currentDay;
+    cb(datesMatch)
 }
 
 const checkCollectionExist = async (db, collName, cb) => {

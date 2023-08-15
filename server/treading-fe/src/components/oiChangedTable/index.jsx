@@ -22,10 +22,10 @@ const OiChangedTable = ({ OiData = [] }) => {
             </thead>
             <tbody className='body'>
                 {
-                    OiData?.length && OiData?.map((item, ind) => {
+                    OiData?.length ? OiData.reverse()?.map((item, ind) => {
                         const changePE = item?.call < 0 ? Math.abs(item?.put) + Math.abs(item?.call) : Math.abs(item?.put)
                         const changeCE = item?.put < 0 ? Math.abs(item?.call) + Math.abs(item?.put) : Math.abs(item?.call)
-                        const pcrRation = (changePE / changeCE).toFixed(4)
+                        const pcrRation = (changePE === 0 && changePE === 0) ? "-" : (changePE / changeCE).toFixed(4)
 
                         return (
                             <tr className={pcrRation < 1 ? "danger" : "safe"} key={`oiData${ind}`}>
@@ -33,12 +33,12 @@ const OiChangedTable = ({ OiData = [] }) => {
                                 <td>{item.call}</td>
                                 <td>{pcrRation}</td>
                                 <td>{item.put - item.call}</td>
-                                <td>{item.time}</td>
+                                <td>{item.Htime}</td>
                                 <td>{item.put}</td>
                                 <td>{item.putOi}</td>
                             </tr>
                         )
-                    })
+                    }) : <tr><td colSpan={7}>Data not available</td></tr>
                 }
             </tbody>
         </table>

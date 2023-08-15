@@ -13,7 +13,6 @@ const Main = () => {
 
   useEffect(() => {
     niftyTodayData((rsp) => {
-      console.log("Response is ", rsp);
       if (rsp.length) {
         setNseCurrentData(rsp[rsp.length - 1].filtered?.data)
         oiChangedFormatted(rsp, (finalData) => {
@@ -21,6 +20,20 @@ const Main = () => {
         })
       }
     })
+  }, [])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      niftyTodayData((rsp) => {
+        if (rsp.length) {
+          setNseCurrentData(rsp[rsp.length - 1].filtered?.data)
+          oiChangedFormatted(rsp, (finalData) => {
+            setOiChangedData(finalData)
+          })
+        }
+      })
+    }, 3 * 60 * 1000);
+    return () => clearInterval(interval);
   }, [])
 
   const handleSelectedTab = (selected) => {

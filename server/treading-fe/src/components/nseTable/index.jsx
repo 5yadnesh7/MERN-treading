@@ -27,7 +27,7 @@ const NseTable = ({ tData = [] }) => {
                 </tr>
             </thead>
             <tbody className={"body"}>
-                {tData.length && tData?.map((item, ind) => {
+                {tData.length ? tData?.map((item, ind) => {
                     const callInTheMoney = item.CE.underlyingValue > item.CE.strikePrice
                     const putInTheMoney = item.CE.underlyingValue < item.CE.strikePrice
                     if (item.CE.strikePrice > item.CE.underlyingValue && item.CE.underlyingValue > item.CE.strikePrice - 50) {
@@ -71,7 +71,7 @@ const NseTable = ({ tData = [] }) => {
                             <td className={`${putInTheMoney ? "inTheMoney" : "outTheMoney"}`}>{item.PE.openInterest}</td>
                         </tr>
                     );
-                })}
+                }) : <tr><td colSpan={13}>Data not available</td></tr>}
             </tbody>
         </table>
     )
