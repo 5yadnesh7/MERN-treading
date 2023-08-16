@@ -16,3 +16,11 @@ export const bankNiftyTodayData = (cb) => {
         cb(rsp)
     });
 };
+
+export const niftyOiData = (cb) => {
+    const url = urlCreator(endpoint.nifty.oiData);
+    const conf = headers();
+    apiCalls(url, {}, conf, "get", (rsp) => {
+        cb(rsp)
+    });
+};

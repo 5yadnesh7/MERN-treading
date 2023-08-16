@@ -56,7 +56,7 @@ export const oiChangedFormatted = (dataAry, cb) => {
     })
 }
 
-const formateDataByInterval = (dataAry = [], intervalTime = 5, cb) => {
+export const formateDataByInterval = (dataAry = [], intervalTime = 5, cb) => {
     const result = [dataAry[0]];
     const interval = intervalTime * 60 * 1000;
     const formatTime = (timeStr) => {

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import "./main.scss";
-import { niftyTodayData } from './helpers/services';
+import { niftyOiData, niftyTodayData } from './helpers/services';
 import NseTable from './components/nseTable';
-import { oiChangedFormatted } from './helpers/methods';
+import { formateDataByInterval, oiChangedFormatted } from './helpers/methods';
 import OiChangedTable from './components/oiChangedTable';
 
 const Main = () => {
@@ -15,8 +15,15 @@ const Main = () => {
     niftyTodayData((rsp) => {
       if (rsp.length) {
         setNseCurrentData(rsp[rsp.length - 1].filtered?.data)
-        oiChangedFormatted(rsp, (finalData) => {
-          setOiChangedData(finalData)
+        // oiChangedFormatted(rsp, (finalData) => {
+        //   setOiChangedData(finalData)
+        // })
+      }
+    })
+    niftyOiData((rsp) => {
+      if (rsp.length) {
+        formateDataByInterval(rsp, 5, (formatedData) => {
+          setOiChangedData(formatedData)
         })
       }
     })
@@ -27,8 +34,15 @@ const Main = () => {
       niftyTodayData((rsp) => {
         if (rsp.length) {
           setNseCurrentData(rsp[rsp.length - 1].filtered?.data)
-          oiChangedFormatted(rsp, (finalData) => {
-            setOiChangedData(finalData)
+          // oiChangedFormatted(rsp, (finalData) => {
+          //   setOiChangedData(finalData)
+          // })
+        }
+      })
+      niftyOiData((rsp) => {
+        if (rsp.length) {
+          formateDataByInterval(rsp, 5, (formatedData) => {
+            setOiChangedData(formatedData)
           })
         }
       })
