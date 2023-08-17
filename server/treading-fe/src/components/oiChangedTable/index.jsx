@@ -23,19 +23,19 @@ const OiChangedTable = ({ OiData = [] }) => {
             <tbody className='body'>
                 {
                     OiData?.length ? OiData.reverse()?.map((item, ind) => {
-                        const changePE = item?.call < 0 ? Math.abs(item?.put) + Math.abs(item?.call) : Math.abs(item?.put)
-                        const changeCE = item?.put < 0 ? Math.abs(item?.call) + Math.abs(item?.put) : Math.abs(item?.call)
+                        const changePE = item?.callOi < 0 ? Math.abs(item?.putOi) + Math.abs(item?.callOi) : Math.abs(item?.putOi)
+                        const changeCE = item?.putOi < 0 ? Math.abs(item?.callOi) + Math.abs(item?.putOi) : Math.abs(item?.callOi)
                         const pcrRation = (changePE === 0 && changePE === 0) ? "-" : (changePE / changeCE).toFixed(4)
 
                         return (
                             <tr className={pcrRation < 1 ? "danger" : "safe"} key={`oiData${ind}`}>
-                                <td>{item.callOi}</td>
                                 <td>{item.call}</td>
+                                <td>{item.callOi}</td>
                                 <td>{pcrRation}</td>
-                                <td>{item.put - item.call}</td>
+                                <td>{item.putOi - item.callOi}</td>
                                 <td>{item.Htime}</td>
-                                <td>{item.put}</td>
                                 <td>{item.putOi}</td>
+                                <td>{item.put}</td>
                             </tr>
                         )
                     }) : <tr><td colSpan={7}>Data not available</td></tr>

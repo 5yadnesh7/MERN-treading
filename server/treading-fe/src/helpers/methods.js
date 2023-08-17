@@ -49,7 +49,7 @@ export const oiChangedFormatted = (dataAry, cb) => {
             changedCE += item?.CE?.changeinOpenInterest || 0;
             changedPE += item?.PE?.changeinOpenInterest || 0;
         });
-        finalAry.push({ call: changedCE, put: changedPE, time, callOi: oiCE, putOi: oiPE })
+        finalAry.push({ call: oiCE, put: oiPE, time, callOi: changedCE, putOi: changedPE })
     })
     formateDataByInterval(finalAry, 5, (rsp) => {
         cb(rsp)
