@@ -36,6 +36,7 @@ export const headers = (obj = "") => {
     return header;
 };
 
+// currently not use
 export const oiChangedFormatted = (dataAry, cb) => {
     const finalAry = []
     // eslint-disable-next-line
@@ -56,16 +57,17 @@ export const oiChangedFormatted = (dataAry, cb) => {
     })
 }
 
+export const formatHTime = (timeStr) => {
+    const date = new Date(timeStr);
+    const hours = date.getHours() % 12 || 12;
+    const minutes = date.getMinutes();
+    const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+    return `${hours}:${minutes < 10 ? '0' : ''}${minutes} ${ampm}`;
+};
+
 export const formateDataByInterval = (dataAry = [], intervalTime = 5, cb) => {
     const result = [dataAry[0]];
     const interval = intervalTime * 60 * 1000;
-    const formatTime = (timeStr) => {
-        const date = new Date(timeStr);
-        const hours = date.getHours() % 12 || 12;
-        const minutes = date.getMinutes();
-        const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
-        return `${hours}:${minutes < 10 ? '0' : ''}${minutes} ${ampm}`;
-    };
 
     for (let i = 1; i < dataAry.length; i++) {
         const prevTime = new Date(result[result.length - 1].time);
@@ -77,7 +79,7 @@ export const formateDataByInterval = (dataAry = [], intervalTime = 5, cb) => {
     }
 
     for (const item of result) {
-        item.Htime = formatTime(item.time);
+        item.Htime = formatHTime(item.time);
     }
     cb(result)
 }

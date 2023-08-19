@@ -24,3 +24,11 @@ export const niftyOiData = (cb) => {
         cb(rsp)
     });
 };
+
+export const niftyTopFiveOi = (cb) => {
+    const url = urlCreator(endpoint.nifty.topFiveOi);
+    const conf = headers();
+    apiCalls(url, {}, conf, "get", (rsp) => {
+        cb(rsp)
+    });
+};

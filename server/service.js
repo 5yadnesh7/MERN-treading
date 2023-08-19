@@ -1,20 +1,23 @@
-const { getData, getFormattedDate } = require('./helpers/methods');
+const { getFormattedDate, aggregationFunc, dySPAggCall } = require('./helpers/methods');
 const ObjectId = require('mongodb').ObjectId;
-const getDb = require('./helpers/connection').getDb;
 
 module.exports.niftyData = async function (req, res) {
     try {
         const currentDataObj = getFormattedDate();
-        const db = getDb();
-        const data = await db.collection(currentDataObj.niftyCol).aggregate([
+        const aggAry = [
+            { $sort: { "records.timestamp": -1 } },
+            { $limit: 1 },
             {
                 $project: {
+                    _id: 0,
                     filtered: 1,
                     timezone: "$records.timestamp",
                 }
             }
-        ]).toArray()
-        res.send({ status: true, message: "Success", data: data })
+        ]
+        aggregationFunc(aggAry, currentDataObj.niftyCol, (rspData) => {
+            res.send({ status: true, message: "Success", data: rspData })
+        })
     } catch (e) {
         console.log("Error in nifty data ", e);
         res.send({ status: false, message: "Fail", data: e.toString() });
@@ -24,16 +27,20 @@ module.exports.niftyData = async function (req, res) {
 module.exports.bankNiftyData = async function (req, res) {
     try {
         const currentDataObj = getFormattedDate();
-        const db = getDb();
-        const data = await db.collection(currentDataObj.bankCol).aggregate([
+        const aggAry = [
+            { $sort: { "records.timestamp": -1 } },
+            { $limit: 1 },
             {
                 $project: {
+                    _id: 0,
                     filtered: 1,
                     timezone: "$records.timestamp",
                 }
             }
-        ]).toArray()
-        res.send({ status: true, message: "Success", data: data })
+        ]
+        aggregationFunc(aggAry, currentDataObj.bankCol, (rspData) => {
+            res.send({ status: true, message: "Success", data: rspData })
+        })
     } catch (e) {
         console.log("Error in nifty data ", e);
         res.send({ status: false, message: "Fail", data: e.toString() });
@@ -43,8 +50,7 @@ module.exports.bankNiftyData = async function (req, res) {
 module.exports.niftyOIData = async function (req, res) {
     try {
         const currentDataObj = getFormattedDate();
-        const db = getDb();
-        const data = await db.collection(currentDataObj.niftyCol).aggregate([
+        const aggAry = [
             {
                 $project: {
                     records: 1,
@@ -65,31 +71,99 @@ module.exports.niftyOIData = async function (req, res) {
             },
             {
                 $project: {
-                    time: "$_id",
                     _id: 0,
+                    time: "$_id",
                     call: 1,
                     callOi: 1,
                     put: 1,
                     putOi: 1,
-                    diff: { $subtract: ["$putOi", "$callOi"] },
-                    PCR: {
-                        $cond: {
-                            if: { $eq: ["$callOi", 0] },
-                            then: 0,
-                            else: {
-                                $divide: ["$putOi", "$callOi"]
-                            }
-                        }
-                    }
                 }
             },
             {
                 $sort: {
-                    time: 1
+                    "time": 1
                 }
             }
-        ]).toArray()
-        res.send({ status: true, message: "Success", data: data })
+        ]
+        aggregationFunc(aggAry, currentDataObj.niftyCol, (rspData) => {
+            res.send({ status: true, message: "Success", data: rspData })
+        })
+    } catch (e) {
+        console.log("Error in nifty data ", e);
+        res.send({ status: false, message: "Fail", data: e.toString() });
+    }
+}
+
+module.exports.niftyTopFiveOi = async function (req, res) {
+    try {
+        const currentDataObj = getFormattedDate();
+        const PEAggAry = [
+            {
+                $sort: {
+                    "records.timestamp": -1
+                }
+            },
+            { $limit: 1 },
+            {
+                $project: {
+                    finalData: "$filtered.data"
+                }
+            },
+            {
+                $unwind: "$finalData"
+            },
+            {
+                $project: {
+                    _id: 0,
+                    PEOpenInterest: "$finalData.PE.openInterest",
+                    strikePrice: "$finalData.PE.strikePrice"
+                }
+            },
+            {
+                $sort: {
+                    PEOpenInterest: -1
+                }
+            },
+            { $limit: 5 }
+        ]
+        const CEaggAry = [
+            {
+                $sort: {
+                    "records.timestamp": -1
+                }
+            },
+            { $limit: 1 },
+            {
+                $project: {
+                    finalData: "$filtered.data"
+                }
+            },
+            {
+                $unwind: "$finalData"
+            },
+            {
+                $project: {
+                    _id: 0,
+                    CEOpenInterest: "$finalData.CE.openInterest",
+                    strikePrice: "$finalData.CE.strikePrice"
+                }
+            },
+            {
+                $sort: {
+                    CEOpenInterest: -1
+                }
+            },
+            { $limit: 5 }
+        ]
+        aggregationFunc(PEAggAry, currentDataObj.niftyCol, (PErspData) => {
+            aggregationFunc(CEaggAry, currentDataObj.niftyCol, (CErspData) => {
+                dySPAggCall(PErspData, currentDataObj.niftyCol, (PEOverAllAry) => {
+                    dySPAggCall(CErspData, currentDataObj.niftyCol, (CEOverAllAry) => {
+                        res.send({ status: true, message: "Success", data: { PE: PEOverAllAry, CE: CEOverAllAry } })
+                    })
+                })
+            })
+        })
     } catch (e) {
         console.log("Error in nifty data ", e);
         res.send({ status: false, message: "Fail", data: e.toString() });

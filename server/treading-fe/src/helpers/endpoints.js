@@ -5,6 +5,7 @@ export const endpoint = {
     nifty: {
         todaysData: "/niftyData",
         oiData: "/niftyOIData",
+        topFiveOi: "/niftyTopFiveOi"
     },
     bankNifty: {
         todaysData: "/bankNiftyData",

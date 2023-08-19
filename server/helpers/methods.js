@@ -29,6 +29,12 @@ const deleteData = async (delObj, collectionName, cb) => {
     cb(deletedData)
 }
 
+const aggregationFunc = async (arr, collectionName, cb) => {
+    const db = getDb();
+    const data = await db.collection(collectionName).aggregate(arr).toArray()
+    cb(data)
+}
+
 const cronJob = () => {
     try {
         const db = getDb();
@@ -118,7 +124,45 @@ const getFormattedDate = () => {
     const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
     const year = today.getFullYear();
     const finalDate = day + month + year
-    return { date: finalDate, niftyCol: `nifty50-${finalDate}`, bankCol: `bankNifty-${finalDate}` };
+    return { date: finalDate, niftyCol: `nifty50-17082023`, bankCol: `bankNifty-${finalDate}` };
+    // return { date: finalDate, niftyCol: `nifty50-${finalDate}`, bankCol: `bankNifty-${finalDate}` };
 }
 
-module.exports = { insertData, updateData, getData, deleteData, cronJob, getFormattedDate };
+// true for PE and false for CE
+const dynamicSPandOi = (price, type) => {
+    const spType = type ? "filtered.data.PE.strikePrice" : "filtered.data.CE.strikePrice"
+    const oiType = type ? "filtered.data.PE.openInterest" : "filtered.data.CE.openInterest"
+    const comAry = [
+        {
+            $unwind: "$filtered.data"
+        },
+        {
+            $match: {
+                [spType]: price
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                x: "$records.timestamp",
+                y: `$${oiType}`
+            }
+        }
+    ]
+    return comAry
+}
+
+const dySPAggCall = (inpuAry, collectionName, cb) => {
+    const dataAry = []
+    inpuAry.map((item, ind) => {
+        const dyAry = dynamicSPandOi(item.strikePrice, true)
+        aggregationFunc(dyAry, collectionName, (dyRsp) => {
+            dataAry.push({ strikePrice: item.strikePrice, data: dyRsp })
+            if (inpuAry.length === ind + 1) {
+                setTimeout(() => { cb(dataAry) }, 10)
+            }
+        })
+    })
+}
+
+module.exports = { insertData, updateData, getData, deleteData, aggregationFunc, cronJob, getFormattedDate, dySPAggCall };
