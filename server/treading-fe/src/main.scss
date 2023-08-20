@@ -32,5 +32,11 @@
                 outline: none;
             }
         }
+        .active{
+            background-color: aquamarine;
+        }
+        .inactive{
+            background-color: burlywood;
+        }
     }
 }

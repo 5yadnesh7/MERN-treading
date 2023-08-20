@@ -171,10 +171,10 @@ const Main = () => {
         </select>
       </div>
       <div className={"top-btn-container"}>
-        <button onClick={() => handleSelectedTab("nseTable")}>NSE Table</button>
-        <button onClick={() => handleSelectedTab("oiTable")}>OI Table</button>
-        <button onClick={() => handleSelectedTab("topFiveOi")}>Top 5 OI</button>
-        <button onClick={() => handleSelectedTab("barGraph")}>OI Graph</button>
+        <button className={selectedTab.nseTable ? "active" : "inactive"} onClick={() => handleSelectedTab("nseTable")}>NSE Table</button>
+        <button className={selectedTab.oiTable ? "active" : "inactive"} onClick={() => handleSelectedTab("oiTable")}>OI Table</button>
+        <button className={selectedTab.topFiveOi ? "active" : "inactive"} onClick={() => handleSelectedTab("topFiveOi")}>Top 5 OI</button>
+        <button className={selectedTab.barGraph ? "active" : "inactive"} onClick={() => handleSelectedTab("barGraph")}>OI Graph</button>
       </div>
       {selectedTab.nseTable && nseCurrentData.length ? <NseTable tData={nseCurrentData} key={"nseLatestDataTable"} /> : null}
       {selectedTab.oiTable && oiChangedData.length ? <OiChangedTable OiData={oiChangedData} /> : null}
