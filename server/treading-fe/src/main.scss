@@ -1,4 +1,22 @@
 .main-container{
+    .option-selector{
+        width: 80%;
+        margin-left: 10%;
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        select{
+            width: 100px;
+            height: 40px;
+            border: 1px solid #000;
+            border-radius: 5px;
+            cursor: pointer;
+            :focus{
+                outline: none;
+            }
+        }
+    }
     .top-btn-container{
         width: 80%;
         margin-left: 10%;

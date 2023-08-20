@@ -9,5 +9,7 @@ export const endpoint = {
     },
     bankNifty: {
         todaysData: "/bankNiftyData",
+        oiData: "/bankNiftyOIData",
+        topFiveOi: "/bankNiftyTopFiveOi"
     },
 }

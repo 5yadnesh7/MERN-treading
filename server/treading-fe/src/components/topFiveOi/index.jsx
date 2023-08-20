@@ -36,7 +36,7 @@ const TopFiveOi = ({ data }) => {
             }
         })
         setFinalData({ CE: CEData, PE: PEData })
-    }, [])
+    }, [data])
 
     return (
         <div className="topFiveContainer">

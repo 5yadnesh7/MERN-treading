@@ -25,8 +25,24 @@ export const niftyOiData = (cb) => {
     });
 };
 
+export const bankNiftyOiData = (cb) => {
+    const url = urlCreator(endpoint.bankNifty.oiData);
+    const conf = headers();
+    apiCalls(url, {}, conf, "get", (rsp) => {
+        cb(rsp)
+    });
+};
+
 export const niftyTopFiveOi = (cb) => {
     const url = urlCreator(endpoint.nifty.topFiveOi);
+    const conf = headers();
+    apiCalls(url, {}, conf, "get", (rsp) => {
+        cb(rsp)
+    });
+};
+
+export const bankNiftyTopFiveOi = (cb) => {
+    const url = urlCreator(endpoint.bankNifty.topFiveOi);
     const conf = headers();
     apiCalls(url, {}, conf, "get", (rsp) => {
         cb(rsp)
