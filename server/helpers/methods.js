@@ -124,8 +124,8 @@ const getFormattedDate = () => {
     const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
     const year = today.getFullYear();
     const finalDate = day + month + year
-    return { date: finalDate, niftyCol: `nifty50-17082023`, bankCol: `bankNifty-17082023` };
-    // return { date: finalDate, niftyCol: `nifty50-${finalDate}`, bankCol: `bankNifty-${finalDate}` };
+    // return { date: finalDate, niftyCol: `nifty50-17082023`, bankCol: `bankNifty-17082023` };
+    return { date: finalDate, niftyCol: `nifty50-${finalDate}`, bankCol: `bankNifty-${finalDate}` };
 }
 
 // true for PE and false for CE
