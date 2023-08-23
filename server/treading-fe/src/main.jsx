@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import "./main.scss";
 import { bankNiftyOiData, bankNiftyTodayData, bankNiftyTopFiveOi, niftyOiData, niftyTodayData, niftyTopFiveOi } from './helpers/services';
 import NseTable from './components/nseTable';
-import { filterByStrikePrice, formateDataByInterval } from './helpers/methods';
+import { filterByStrikePrice } from './helpers/methods';
 import OiChangedTable from './components/oiChangedTable';
 import TopFiveOi from './components/topFiveOi';
 import BarChart from './components/barChart';
@@ -70,9 +70,7 @@ const Main = () => {
         } else if (selectedTab.oiTable) {
           niftyOiData((rsp) => {
             if (rsp.length) {
-              formateDataByInterval(rsp, 5, (formatedData) => {
-                setOiChangedData(formatedData)
-              })
+              setOiChangedData(rsp)
             }
           })
         } else if (selectedTab.topFiveOi) {
@@ -91,9 +89,7 @@ const Main = () => {
         } else if (selectedTab.oiTable) {
           bankNiftyOiData((rsp) => {
             if (rsp.length) {
-              formateDataByInterval(rsp, 5, (formatedData) => {
-                setOiChangedData(formatedData)
-              })
+              setOiChangedData(rsp)
             }
           })
         } else if (selectedTab.topFiveOi) {
@@ -118,9 +114,7 @@ const Main = () => {
       } else if (selectedTab.oiTable) {
         niftyOiData((rsp) => {
           if (rsp.length) {
-            formateDataByInterval(rsp, 5, (formatedData) => {
-              setOiChangedData(formatedData)
-            })
+            setOiChangedData(rsp)
           }
         })
       } else if (selectedTab.topFiveOi) {
@@ -139,9 +133,7 @@ const Main = () => {
       } else if (selectedTab.oiTable) {
         bankNiftyOiData((rsp) => {
           if (rsp.length) {
-            formateDataByInterval(rsp, 5, (formatedData) => {
-              setOiChangedData(formatedData)
-            })
+            setOiChangedData(rsp)
           }
         })
       } else if (selectedTab.topFiveOi) {

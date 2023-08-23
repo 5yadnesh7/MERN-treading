@@ -65,6 +65,7 @@ export const formatHTime = (timeStr) => {
     return `${hours}:${minutes < 10 ? '0' : ''}${minutes} ${ampm}`;
 };
 
+// currently not use
 export const formateDataByInterval = (dataAry = [], intervalTime = 5, cb) => {
     const result = [dataAry[0]];
     const interval = intervalTime * 60 * 1000;

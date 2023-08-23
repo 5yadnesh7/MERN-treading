@@ -165,4 +165,73 @@ const dySPAggCall = (inpuAry, collectionName, cb) => {
     })
 }
 
-module.exports = { insertData, updateData, getData, deleteData, aggregationFunc, cronJob, getFormattedDate, dySPAggCall };
+const getLimitedData = (arr, timeNode, interval = 5) => {
+
+    function findNearestMatch(inputTimezone) {
+        const targetTime = new Date(inputTimezone).getTime();
+        let nearestIndex = -1;
+        let minTimeDifference = Infinity;
+
+        for (let i = 0; i < arr.length; i++) {
+            const currentTime = new Date(arr[i][timeNode]).getTime();
+
+            if (currentTime >= targetTime) {
+                const timeDifference = currentTime - targetTime;
+
+                if (timeDifference < minTimeDifference) {
+                    minTimeDifference = timeDifference;
+                    nearestIndex = i;
+                }
+            }
+        }
+
+        if (nearestIndex !== -1) {
+            return arr[nearestIndex];
+        } else {
+            return null;
+        }
+    }
+    function AddMinutesToDate(date, minutes) {
+        return new Date(date.getTime() + minutes * 60000);
+    }
+
+    const startTime = new Date()
+    startTime.setHours(9)
+    startTime.setMinutes(15)
+    startTime.setSeconds("00")
+    startTime.setMilliseconds("00")
+
+    const endTime = new Date(arr[arr.length - 1][timeNode])
+
+    const timeAry = []
+    for (let i = startTime; i <= endTime; i = AddMinutesToDate(i, interval)) {
+        timeAry.push(i)
+    }
+
+    const newAry = []
+    for (let i = 0; i <= timeAry.length; i++) {
+        const item = timeAry[i]
+        const nearestMatch = findNearestMatch(item);
+        if (nearestMatch !== null) {
+            newAry.push(nearestMatch);
+        }
+        if (item > new Date(arr[arr.length - 1][timeNode])) {
+            break;
+        }
+    }
+    newAry.map(item => {
+        item.Htime = formatHTime(item.time)
+        delete item.time;
+    })
+    return newAry.reverse();
+}
+
+const formatHTime = (timeStr) => {
+    const date = new Date(timeStr);
+    const hours = date.getHours() % 12 || 12;
+    const minutes = date.getMinutes();
+    const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+    return `${hours}:${minutes < 10 ? '0' : ''}${minutes} ${ampm}`;
+};
+
+module.exports = { insertData, updateData, getData, deleteData, aggregationFunc, cronJob, getFormattedDate, dySPAggCall, getLimitedData };

@@ -1,4 +1,4 @@
-const { getFormattedDate, aggregationFunc, dySPAggCall } = require('./helpers/methods');
+const { getFormattedDate, aggregationFunc, dySPAggCall, getLimitedData } = require('./helpers/methods');
 const ObjectId = require('mongodb').ObjectId;
 
 module.exports.niftyData = async function (req, res) {
@@ -117,7 +117,8 @@ const oiData = (collectionName, res) => {
         }
     ]
     aggregationFunc(aggAry, collectionName, (rspData) => {
-        res.send({ status: true, message: "Success", data: rspData })
+        const formatedData = getLimitedData(rspData, "time", 5)
+        res.send({ status: true, message: "Success", data: formatedData })
     })
 }
 

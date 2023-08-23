@@ -22,7 +22,7 @@ const OiChangedTable = ({ OiData = [] }) => {
             </thead>
             <tbody className='body'>
                 {
-                    OiData?.length ? OiData.reverse()?.map((item, ind) => {
+                    OiData?.length ? OiData?.map((item, ind) => {
                         const changePE = item?.callOi < 0 ? Math.abs(item?.putOi) + Math.abs(item?.callOi) : Math.abs(item?.putOi)
                         const changeCE = item?.putOi < 0 ? Math.abs(item?.callOi) + Math.abs(item?.putOi) : Math.abs(item?.callOi)
                         const pcrRation = (changePE === 0 && changePE === 0) ? "-" : (changePE / changeCE).toFixed(4)
