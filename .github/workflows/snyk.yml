@@ -39,14 +39,14 @@ jobs:
       # Run dependency scan once for entire repo
       # -----------------------------
       - name: Snyk dependency scan (JSON output)
-        run: snyk test --all-projects --json-file-output=deps.json --severity-threshold=medium
+        run: snyk test --all-projects --json-file-output=deps.json
         continue-on-error: true
 
       # -----------------------------
       # Run Snyk Code scan once for entire repo
       # -----------------------------
       - name: Snyk Code (SAST) scan (JSON output)
-        run: snyk code test --all-projects --json-file-output=code.json --severity-threshold=medium || true
+        run: snyk code test --all-projects --json-file-output=code.json || true
 
       # -----------------------------
       # Generate HTML reports
