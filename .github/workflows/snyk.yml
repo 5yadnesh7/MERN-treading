@@ -1,0 +1,89 @@
+name: Snyk Security Scan
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  snyk:
+    name: Snyk Scan
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Snyk CLI
+        uses: snyk/actions/setup@master
+
+      - name: Authenticate with Snyk
+        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+
+      # -----------------------------
+      # Dependency (Open Source) scan
+      # -----------------------------
+      - name: Run Snyk dependency test (JSON output)
+        run: snyk test --json-file-output=deps-snyk.json --severity-threshold=medium
+        continue-on-error: true
+
+      # -----------------------------
+      # Snyk Code (SAST) scan
+      # -----------------------------
+      - name: Run Snyk Code (SAST) test (JSON output)
+        run: snyk code test --json-file-output=code-snyk.json --severity-threshold=medium || true
+
+      # -----------------------------
+      # Convert JSONs → HTMLs and package them
+      # -----------------------------
+      - name: Generate combined Snyk HTML reports
+        run: |
+          npm install -g snyk-to-html
+
+          mkdir snyk-report
+
+          if [ -f deps-snyk.json ]; then
+            snyk-to-html -i deps-snyk.json -o snyk-report/snyk-deps-report.html
+          else
+            echo "⚠️ No dependency JSON found."
+          fi
+
+          if [ -f code-snyk.json ]; then
+            snyk-to-html -i code-snyk.json -o snyk-report/snyk-code-report.html
+          else
+            echo "⚠️ No Snyk Code JSON found."
+          fi
+
+          echo "✅ Combined reports generated in snyk-report/"
+
+        shell: bash
+        continue-on-error: true
+
+      # -----------------------------
+      # Upload one ZIP artifact
+      # -----------------------------
+      - name: Upload combined Snyk report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: snyk-full-report
+          path: snyk-report
+
+      # -----------------------------
+      # Final enforcement step
+      # -----------------------------
+      - name: Fail build on high/critical issues
+        run: snyk test --severity-threshold=high
