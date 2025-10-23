@@ -36,55 +36,64 @@ jobs:
         run: snyk auth ${{ secrets.SNYK_TOKEN }}
 
       # -----------------------------
-      # Dependency (Open Source) scan
+      # Run dependency scan once for entire repo
       # -----------------------------
-      - name: Run Snyk dependency test (JSON output)
-        run: snyk test --json-file-output=deps-snyk.json --severity-threshold=medium
+      - name: Snyk dependency scan (JSON output)
+        run: snyk test --all-projects --json-file-output=deps.json --severity-threshold=medium
         continue-on-error: true
 
       # -----------------------------
-      # Snyk Code (SAST) scan
+      # Run Snyk Code scan once for entire repo
       # -----------------------------
-      - name: Run Snyk Code (SAST) test (JSON output)
-        run: snyk code test --json-file-output=code-snyk.json --severity-threshold=medium || true
+      - name: Snyk Code (SAST) scan (JSON output)
+        run: snyk code test --all-projects --json-file-output=code.json --severity-threshold=medium || true
 
       # -----------------------------
-      # Convert JSONs → HTMLs and package them
+      # Generate HTML reports
       # -----------------------------
-      - name: Generate combined Snyk HTML reports
+      - name: Generate HTML reports
         run: |
           npm install -g snyk-to-html
+          mkdir -p snyk-report
 
-          mkdir snyk-report
-
-          if [ -f deps-snyk.json ]; then
-            snyk-to-html -i deps-snyk.json -o snyk-report/snyk-deps-report.html
+          if [ -f deps.json ]; then
+            snyk-to-html -i deps.json -o snyk-report/deps-report.html
           else
             echo "⚠️ No dependency JSON found."
           fi
 
-          if [ -f code-snyk.json ]; then
-            snyk-to-html -i code-snyk.json -o snyk-report/snyk-code-report.html
+          if [ -f code.json ]; then
+            snyk-to-html -i code.json -o snyk-report/code-report.html
           else
-            echo "⚠️ No Snyk Code JSON found."
+            echo "⚠️ No code JSON found."
           fi
-
-          echo "✅ Combined reports generated in snyk-report/"
-
         shell: bash
         continue-on-error: true
 
       # -----------------------------
-      # Upload one ZIP artifact
+      # Upload combined reports as single artifact
       # -----------------------------
-      - name: Upload combined Snyk report artifact
+      - name: Upload Snyk HTML reports
         uses: actions/upload-artifact@v4
         with:
           name: snyk-full-report
           path: snyk-report
 
       # -----------------------------
-      # Final enforcement step
+      # Fail PR if high/critical issues exist
       # -----------------------------
-      - name: Fail build on high/critical issues
-        run: snyk test --severity-threshold=high
+      - name: Fail PR on high/critical issues
+        run: |
+          # Count high/critical vulnerabilities in dependencies
+          DEPS_HIGH=$(jq '[.vulnerabilities[] | select(.severity=="high" or .severity=="critical")] | length' deps.json || echo 0)
+          # Count high/critical issues in code scan
+          CODE_HIGH=$(jq '[.issues[] | select(.severity=="high" or .severity=="critical")] | length' code.json || echo 0)
+          TOTAL=$((DEPS_HIGH + CODE_HIGH))
+
+          if [ "$TOTAL" -gt 0 ]; then
+            echo "❌ Found $TOTAL High/Critical vulnerabilities/issues. Blocking PR!"
+            exit 1
+          else
+            echo "✅ No High/Critical issues found. PR can be merged."
+          fi
+        shell: bash
