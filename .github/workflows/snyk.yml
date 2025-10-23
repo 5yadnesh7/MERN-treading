@@ -25,8 +25,9 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install dependencies (auto)
+        run: |
+          find . -name package.json -not -path "*/node_modules/*" -execdir npm install --legacy-peer-deps \;
 
       - name: Install Snyk CLI
         uses: snyk/actions/setup@master
